@@ -7,6 +7,10 @@ card_thickness = 2; //[5] is best
 emboss_level = .6;
 // Width of card border in millimeters
 border_width = 1; 
+// How many inventory squares wide should the card be?
+squares_wide = 1;
+// How many inventory squares tall should the card be?
+squares_tall = 1;
 // Title text for card
 card_title = "Dagger"; 
 // Number of use pips
@@ -18,7 +22,7 @@ detail_text = "d6";
 // Filename of card image in SVG format
 card_image = ""; 
 // Card shape (1, 2h, 2w)
-card_shape = "1"; // [1, 2w, 2t]
+// card_shape = "1"; // [1, 2w, 2t]
 // Define card image dimensions and position
 // Width of card image in millimeters (use square images if possible)
 image_width = 15; 
@@ -29,6 +33,8 @@ image_rotation = 0;//[-360:360]
 image_offset_x = 0; 
 // Image offset vertical
 image_offset_y = -1;
+
+flip_image = false;
 
 // Title font
 title_font = "Bookman Old Style:style=Bold Italic"; //["Bookman Old Style:style=Bold Italic":"Bookman", "Brokenscript\\-BoldCond:style=Regular":"Brokenscript"]
@@ -58,11 +64,6 @@ detail_padding_y = 1;
 print_tolerance = -0.25;
 
 
-// Define card height and width
-// Height of card in millimeters
-base_card_height = 25; 
-// Width of card in millimeters
-base_card_width = 25; 
 // Height of the header area in millimeters
 header_height = 6.5;
 
@@ -72,38 +73,24 @@ pip_hole_diameter = 1.5;
 // Padding to add for difference operations
 /* [Hidden] */
 diff_padding = .5;
+// Define card height and width
+// Height of card in millimeters
+base_card_height = 25; 
+// Width of card in millimeters
+base_card_width = 25; 
 $fn = 100;
 
-card_height = 
-  (card_shape == "1") ? base_card_height + print_tolerance:
-  (card_shape == "2t") ? base_card_height * 2 + print_tolerance: 
-  (card_shape == "2w") ? base_card_height:base_card_height + print_tolerance;
+card_height = base_card_height * squares_tall + print_tolerance;
+  // (card_shape == "1") ? base_card_height + print_tolerance:
+  // (card_shape == "2t") ? base_card_height * 2 + print_tolerance: 
+  // (card_shape == "2w") ? base_card_height:base_card_height + print_tolerance;
 
-card_width = 
-  (card_shape == "1") ? base_card_width + print_tolerance:
-  (card_shape == "2t") ? base_card_width + print_tolerance:
-  (card_shape == "2w") ? base_card_width * 2: base_card_width + print_tolerance;
-
-
-// if (card_shape == "2h") {
-//   echo("2h");
-//   let(card_height = base_card_height * 2);
-//   let(card_width = base_card_width);
-// }
-// else if (card_shape == "2w") {
-//   echo("2w");
-//   let(card_width = base_card_width * 2);
-//   let(card_height = base_card_height);
-// }
-// else{
-//   let(card_height = base_card_height);
-//   let(card_width = base_card_width);
-// }
+card_width = base_card_width * squares_wide + print_tolerance;
+  // (card_shape == "1") ? base_card_width + print_tolerance:
+  // (card_shape == "2t") ? base_card_width + print_tolerance:
+  // (card_shape == "2w") ? base_card_width * 2: base_card_width + print_tolerance;
 
 
-
-// image_x = (card_width - image_width) / 2; // Horizontal position of card image
-// image_y = (card_height - image_height) / 2; // Vertical position of card image
 
 module card_body(){
   // Create card base
@@ -143,15 +130,28 @@ module body_border(){
 
 module card_image(){
   card_image_path = str("../icons/", card_image, ".svg");
-  echo(card_image_path);
+  // y_rotation = flip_image ? 180 : 0;
   // Create card image
   translate([card_width / 2 - image_width / 2 + image_offset_x, (card_height - header_height) / 2 - image_width / 2 + image_offset_y, card_thickness]) 
-  translate([image_width / 2, image_width / 2, 0]) 
-  rotate([0,0,image_rotation]) 
-  translate([-image_width / 2, -image_width / 2, 0]) 
-    linear_extrude(height=emboss_level){
-       resize(newsize=[image_width, 0, 0], auto=true) import(card_image_path);
-    }
+    translate([image_width / 2, image_width / 2, 0]) 
+      rotate([0,0,image_rotation]) 
+        if(flip_image){
+          mirror([1,0,0])
+          translate([-image_width / 2, -image_width / 2, 0]) 
+              linear_extrude(height=emboss_level){
+                resize(newsize=[image_width, 0, 0], auto=true) 
+                  offset(0.01)
+                    import(card_image_path);
+              }
+        }
+        else{
+          translate([-image_width / 2, -image_width / 2, 0]) 
+              linear_extrude(height=emboss_level){
+                resize(newsize=[image_width, 0, 0], auto=true) 
+                  offset(0.01)
+                    import(card_image_path);
+              }
+        }
 }
 
 module pip(){
@@ -208,13 +208,15 @@ module card_type(){
 }
 
 module card_atk_def(border){
-  translate([card_width, card_height - header_height, card_thickness]){
-      translate([-detail_padding_x - border_width, -detail_padding_y,0]) {
-      // Create card title
-      linear_extrude(height=emboss_level){
-        text(detail_text, size = detail_size, halign = "right", valign = "top", font="Courier New:style=Bold");
+  if(detail_text){
+    translate([card_width, card_height - header_height, card_thickness]){
+        translate([-detail_padding_x - border_width, -detail_padding_y,0]) {
+        // Create card title
+        linear_extrude(height=emboss_level){
+          text(detail_text, size = detail_size, halign = "right", valign = "top", font="Courier New:style=Bold");
+        }
+        text_border(chars = len(detail_text), padding_x = 1, padding_y = 1);
       }
-      text_border(chars = len(detail_text), padding_x = 1, padding_y = 1);
     }
   }
 }
@@ -252,10 +254,12 @@ module text_border(chars, padding_x = 0, padding_y = 0, char_width_ratio = 0.8, 
   // Create card roll details
   //text(card_roll_details, halign = "right", valign = "bottom");
 
-card_body();
-body_border();
-card_title();
-card_type();
-card_image();
-card_atk_def();
-pips();
+union(){
+  card_body();
+  body_border();
+  card_title();
+  card_type();
+  card_image();
+  card_atk_def();
+  pips();
+}
