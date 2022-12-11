@@ -2,6 +2,11 @@ Maus-3D is a repository of 3D-printable resources for the RPG Mausritter, by Isa
 
 * itemcondition.scad can be used with OpenSCAD's customizer to quickly generate 3D-printable inventory items to use with 3D-printed character sheets (not yet available).
 
+## Generator instructions
+* Pending
+
+## Caveats
+The previews will show some artifacts (flickering faces). This shouldn't affect the output STLs.
 
 ## Legal/License Info
 Maus-3D is an independent production by Justin Ross and is not affiliated with Losing Games. It is published under the Mausritter Third Party Licence. Mausritter is copyright Losing Games.
