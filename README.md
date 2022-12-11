@@ -6,7 +6,9 @@ Maus-3D is a repository of 3D-printable resources for the RPG Mausritter, by Isa
 * Pending
 
 ## Caveats
-The previews will show some artifacts (flickering faces). This shouldn't affect the output STLs.
+
+* The previews will show some artifacts (flickering faces). This shouldn't affect the output STLs.
+* For compatibility purposes, the default title font is Bookman Old Style (which, I believe, comes with OpenSCAD). The official font is available as an option in the customizer, but will only work if you [download](https://fontsgeek.com/brokenscript-boldcond-font) and install it yourself (I can't include it here for licensing reasons).
 
 ## Legal/License Info
 Maus-3D is an independent production by Justin Ross and is not affiliated with Losing Games. It is published under the Mausritter Third Party Licence. Mausritter is copyright Losing Games.

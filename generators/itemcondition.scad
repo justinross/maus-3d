@@ -2,9 +2,9 @@
 
 /* [Card Details] */
 // Thickness of card in millimeters
-card_thickness = 1; //[5] is best
+card_thickness = 2; //[5] is best
 // Thickness of the embossed areas in mm
-emboss_level = .5;
+emboss_level = .6;
 // Width of card border in millimeters
 border_width = 1; 
 // Title text for card
@@ -29,6 +29,9 @@ image_rotation = 0;//[-360:360]
 image_offset_x = 0; 
 // Image offset vertical
 image_offset_y = -1;
+
+// Title font
+title_font = "Bookman Old Style:style=Bold Italic"; //["Bookman Old Style:style=Bold Italic":"Bookman", "Brokenscript\\-BoldCond:style=Regular":"Brokenscript"]
 
 /* [Advanced] */
 // Title font height
@@ -189,7 +192,7 @@ module card_title(){
   translate([title_offset_x, card_height - header_height + title_offset_y, card_thickness]) {
     // Create card title
     linear_extrude(height=emboss_level){
-      text(card_title, size = title_size, halign = "left", valign = "bottom", font="Brokenscript\\-BoldCond:style=Regular");
+      text(card_title, size = title_size, halign = "left", valign = "bottom", font=title_font);
     }
   }
 }
